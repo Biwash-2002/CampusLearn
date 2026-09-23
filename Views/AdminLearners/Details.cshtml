@@ -1,0 +1,207 @@
+@model CampusLearn.ViewModels.LearnerDetailViewModel
+@{
+    ViewData["Title"] = $"Learner: {Model.Learner.FullName ?? Model.Learner.UserName}";
+}
+
+<div class="py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a asp-controller="AdminLearners" asp-action="Index" class="badge bg-secondary text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Learners
+                </a>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    Role: Learner
+                </span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">@(Model.Learner.FullName ?? Model.Learner.UserName)</h2>
+            <div class="text-muted small">
+                <i class="bi bi-envelope me-1"></i> @Model.Learner.Email
+                <span class="mx-2">•</span>
+                <i class="bi bi-calendar-event me-1"></i> Registered: @Model.Learner.CreatedAt.ToString("MMMM dd, yyyy")
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-controller="AdminLearners" asp-action="Delete" asp-route-id="@Model.Learner.Id" class="btn btn-outline-danger rounded-pill px-4 btn-sm">
+                <i class="bi bi-trash me-1"></i> Delete Account
+            </a>
+            <a asp-controller="AdminLearners" asp-action="Index" class="btn btn-light border rounded-pill px-4 btn-sm">
+                Learner List
+            </a>
+        </div>
+    </div>
+
+    <!-- Metric Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-journal-bookmark-fill fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Enrolled Courses</span>
+                    <h4 class="fw-bold mb-0 text-dark">@Model.Enrollments.Count</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-success bg-opacity-10 text-success p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-check2-circle fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Completed Courses</span>
+                    <h4 class="fw-bold mb-0 text-dark">@Model.Enrollments.Count(e => e.Status == "Completed" || e.ProgressPercentage >= 100)</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-info bg-opacity-10 text-info p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-journal-check fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Completed Lessons</span>
+                    <h4 class="fw-bold mb-0 text-dark">@Model.LessonProgresses.Count(lp => lp.Completed)</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-warning bg-opacity-10 text-warning p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-trophy-fill fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Quizzes Taken</span>
+                    <h4 class="fw-bold mb-0 text-dark">@Model.QuizResults.Count</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrolled Courses -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4 overflow-hidden">
+        <div class="card-header bg-white p-4 border-bottom">
+            <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-journal-bookmark text-primary me-2"></i> Course Enrollments & Progress
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Enrollments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-muted">
+                            <tr>
+                                <th>Course Title</th>
+                                <th>Category</th>
+                                <th>Enrolled Date</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var e in Model.Enrollments)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-dark">
+                                        <a asp-controller="AdminCourses" asp-action="Details" asp-route-id="@e.CourseId" class="text-dark text-decoration-none">
+                                            @e.Course.Title
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle">@e.Course.Category</span></td>
+                                    <td class="text-muted small">@e.EnrollmentDate.ToString("MMM dd, yyyy")</td>
+                                    <td style="width: 200px;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar @(e.ProgressPercentage >= 100 ? "bg-success" : "bg-primary")" role="progressbar" style="width: @e.ProgressPercentage%"></div>
+                                            </div>
+                                            <span class="small fw-semibold text-dark">@e.ProgressPercentage%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (e.Status == "Completed" || e.ProgressPercentage >= 100)
+                                        {
+                                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Completed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">In Progress</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="AdminCourses" asp-action="Details" asp-route-id="@e.CourseId" class="btn btn-sm btn-light border">
+                                            Course Details &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted small">
+                    This learner has not enrolled in any courses yet.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Quiz Submissions -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="card-header bg-white p-4 border-bottom">
+            <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-patch-question text-warning me-2"></i> Quiz Assessment Submissions
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.QuizResults.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-muted">
+                            <tr>
+                                <th>Course Title</th>
+                                <th>Quiz Title</th>
+                                <th>Score</th>
+                                <th>Percentage</th>
+                                <th>Outcome</th>
+                                <th>Submitted On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var qr in Model.QuizResults)
+                            {
+                                var percent = qr.TotalQuestions > 0 ? (int)Math.Round((double)qr.Score / qr.TotalQuestions * 100) : 0;
+                                var isPass = percent >= 60;
+                                <tr>
+                                    <td>@qr.Quiz.Course.Title</td>
+                                    <td class="fw-semibold">@qr.Quiz.Title</td>
+                                    <td>@qr.Score / @qr.TotalQuestions</td>
+                                    <td class="fw-bold">@percent%</td>
+                                    <td>
+                                        <span class="badge @(isPass ? "bg-success" : "bg-danger")">
+                                            @(isPass ? "Passed" : "Failed")
+                                        </span>
+                                    </td>
+                                    <td class="text-muted small">@qr.AttemptDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted small">
+                    No quiz assessments recorded for this learner yet.
+                </div>
+            }
+        </div>
+    </div>
+</div>

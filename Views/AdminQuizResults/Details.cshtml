@@ -1,0 +1,77 @@
+@model CampusLearn.Models.QuizResult
+@{
+    ViewData["Title"] = $"Quiz Submission Details: {Model.Quiz.Title}";
+    var percent = Model.TotalQuestions > 0 ? (int)Math.Round((double)Model.Score / Model.TotalQuestions * 100) : 0;
+    var isPass = percent >= 60;
+}
+
+<div class="py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard">Admin</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="AdminQuizResults" asp-action="Index">Quiz Results</a></li>
+                    <li class="breadcrumb-item active">Submission #@Model.QuizResultId</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Quiz Attempt Report</h2>
+        </div>
+
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a asp-controller="AdminQuizResults" asp-action="Delete" asp-route-id="@Model.QuizResultId" class="btn btn-outline-danger rounded-pill px-4 btn-sm">
+                <i class="bi bi-trash me-1"></i> Delete Record
+            </a>
+            <a asp-controller="AdminQuizResults" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Results
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                <div class="stat-icon-wrapper @(isPass ? "bg-success bg-opacity-10 text-success" : "bg-danger bg-opacity-10 text-danger") mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                    <i class="bi @(isPass ? "bi-check-circle-fill" : "bi-x-circle-fill")"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">@Model.Score / @Model.TotalQuestions</h3>
+                <p class="fs-5 fw-bold @(isPass ? "text-success" : "text-danger") mb-3">@percent% @(isPass ? "(Passed)" : "(Failed)")</p>
+                
+                <div class="border-top pt-3 text-start small text-muted d-flex flex-column gap-1">
+                    <div><strong>Course:</strong> @Model.Quiz.Course.Title</div>
+                    <div><strong>Learner:</strong> @(Model.User?.FullName ?? Model.User?.Email)</div>
+                    <div><strong>Email:</strong> @Model.User?.Email</div>
+                    <div><strong>Submitted:</strong> @Model.AttemptDate.ToString("MMM dd, yyyy HH:mm:ss")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-patch-question text-primary me-2"></i> Quiz Questions & Correct Key
+                </h5>
+                <div class="d-flex flex-column gap-3">
+                    @if (Model.Quiz.Questions != null)
+                    {
+                        var qList = Model.Quiz.Questions.ToList();
+                        for (int i = 0; i < qList.Count; i++)
+                        {
+                            var q = qList[i];
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="fw-bold text-dark mb-2">Question @(i + 1): @q.QuestionText</div>
+                                <div class="row g-2 small mb-2">
+                                    <div class="col-6 @(q.CorrectAnswer == "A" ? "text-success fw-bold" : "text-muted")">A) @q.OptionA</div>
+                                    <div class="col-6 @(q.CorrectAnswer == "B" ? "text-success fw-bold" : "text-muted")">B) @q.OptionB</div>
+                                    <div class="col-6 @(q.CorrectAnswer == "C" ? "text-success fw-bold" : "text-muted")">C) @q.OptionC</div>
+                                    <div class="col-6 @(q.CorrectAnswer == "D" ? "text-success fw-bold" : "text-muted")">D) @q.OptionD</div>
+                                </div>
+                                <div class="badge bg-success">Correct: Option @q.CorrectAnswer</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

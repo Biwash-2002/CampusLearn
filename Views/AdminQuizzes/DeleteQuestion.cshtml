@@ -1,0 +1,42 @@
+@model CampusLearn.Models.Question
+@{
+    ViewData["Title"] = "Delete Question Confirmation";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white text-center">
+            <div class="rounded-circle bg-danger bg-opacity-10 text-danger mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2rem;">
+                <i class="bi bi-trash3-fill"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-2">Delete Question</h3>
+            <p class="text-muted mb-4">
+                Are you sure you want to delete this question? This action will permanently remove the question from the quiz. The quiz and course will not be deleted.
+            </p>
+
+            <div class="card bg-light border p-3 rounded-3 mb-4 text-start small">
+                <div class="mb-2"><strong>Quiz:</strong> @Model.Quiz.Title</div>
+                <div class="mb-2"><strong>Course:</strong> @Model.Quiz.Course.Title</div>
+                <div class="mb-2"><strong>Question:</strong> <span class="text-dark fw-semibold">@Model.QuestionText</span></div>
+                <div class="text-muted">
+                    <div>A: @Model.OptionA @(Model.CorrectAnswer == "A" ? " (Correct)" : "")</div>
+                    <div>B: @Model.OptionB @(Model.CorrectAnswer == "B" ? " (Correct)" : "")</div>
+                    <div>C: @Model.OptionC @(Model.CorrectAnswer == "C" ? " (Correct)" : "")</div>
+                    <div>D: @Model.OptionD @(Model.CorrectAnswer == "D" ? " (Correct)" : "")</div>
+                </div>
+            </div>
+
+            <form asp-controller="AdminQuizzes" asp-action="DeleteQuestion" asp-route-id="@Model.QuestionId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="d-flex justify-content-center gap-3">
+                    <a asp-controller="AdminQuizzes" asp-action="Details" asp-route-id="@Model.QuizId" class="btn btn-light border rounded-pill px-4">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger rounded-pill px-5 fw-bold shadow-sm">
+                        Confirm Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

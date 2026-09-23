@@ -1,0 +1,72 @@
+@model CampusLearn.ViewModels.AdminLoginViewModel
+@{
+    ViewData["Title"] = "Administrator Portal Login";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+            <div class="p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="brand-icon mx-auto mb-3 rounded-3 d-flex align-items-center justify-content-center text-white bg-warning" style="width: 50px; height: 50px; font-size: 1.5rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Administrator Portal</h3>
+                    <p class="text-muted small">Elevated credentials required for academic management</p>
+                </div>
+
+                <div class="alert alert-light border small mb-4 d-flex align-items-center rounded-3">
+                    <i class="bi bi-shield-lock me-2 fs-5 text-warning"></i>
+                    <div>
+                        <strong>Institutional Access:</strong> Elevated credentials are required to manage academic courses, learners, and system configurations.
+                    </div>
+                </div>
+
+                <form asp-controller="Account" asp-action="AdminLogin" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ReturnUrl" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold small">Admin Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-badge text-muted"></i></span>
+                            <input asp-for="Email" type="email" class="form-control bg-light border-start-0" placeholder="admin@campuslearn.com" autocomplete="username" required />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-semibold small">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                            <input asp-for="Password" class="form-control bg-light border-start-0" placeholder="••••••••" autocomplete="current-password" required />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 small">
+                        <div class="form-check">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            <label asp-for="RememberMe" class="form-check-label text-muted">Remember me</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 py-2 rounded-pill fw-bold text-dark shadow-sm mb-3">
+                        <i class="bi bi-shield-check me-2"></i> Access Admin Console
+                    </button>
+
+                    <div class="text-center small">
+                        <a asp-controller="Account" asp-action="Login" class="text-muted text-decoration-none">
+                            <i class="bi bi-arrow-left me-1"></i> Return to Learner Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

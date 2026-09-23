@@ -1,0 +1,215 @@
+@model CampusLearn.ViewModels.CourseDetailViewModel
+@{
+    ViewData["Title"] = Model.Course.Title;
+}
+
+<div class="py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Courses" asp-action="Index" class="text-decoration-none">Courses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Course.Title</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <!-- Main Content (Left) -->
+        <div class="col-lg-8">
+            <div class="bg-white rounded-4 p-4 p-md-5 border shadow-sm mb-4">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    @if (!string.IsNullOrEmpty(Model.Course.Category))
+                    {
+                        <span class="badge bg-primary px-3 py-2 rounded-pill">@Model.Course.Category</span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Course.Duration))
+                    {
+                        <span class="badge bg-dark bg-opacity-75 px-3 py-2 rounded-pill">@Model.Course.Duration</span>
+                    }
+                    <span class="badge bg-light text-muted border px-3 py-2 rounded-pill">
+                        <i class="bi bi-clock me-1"></i> Added @Model.Course.CreatedAt.ToString("MMM dd, yyyy")
+                    </span>
+                </div>
+
+                <h1 class="display-6 fw-bold text-dark mb-3">@Model.Course.Title</h1>
+                <p class="lead text-muted mb-4" style="line-height: 1.8;">
+                    @Model.Course.Description
+                </p>
+
+                @if (Model.IsEnrolled)
+                {
+                    <div class="p-4 rounded-3 bg-primary-subtle border border-primary border-opacity-25 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold text-primary">Your Enrollment Progress</span>
+                            <span class="fw-bold text-primary">@Model.ProgressPercentage% Completed</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar" role="progressbar" style="width: @Model.ProgressPercentage%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>@Model.CompletedLessonsCount of @Model.Lessons.Count Lessons Finished</span>
+                            @if (Model.NextLessonId.HasValue)
+                            {
+                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@Model.NextLessonId" class="fw-bold text-primary text-decoration-none">
+                                    Continue Learning <i class="bi bi-arrow-right"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <h4 class="fw-bold text-dark mt-5 mb-3">
+                    <i class="bi bi-list-nested text-primary me-2"></i> Course Syllabus (@Model.Lessons.Count Lessons)
+                </h4>
+
+                <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                    @foreach (var lesson in Model.Lessons)
+                    {
+                        <div class="list-group-item p-3 d-flex align-items-center justify-content-between @(lesson.IsCompleted ? "bg-light bg-opacity-50" : "")">
+                            <div class="d-flex align-items-center me-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3 @(lesson.IsCompleted ? "bg-success text-white" : "bg-light border text-muted")" style="width: 36px; height: 36px; flex-shrink: 0;">
+                                    @if (lesson.IsCompleted)
+                                    {
+                                        <i class="bi bi-check-lg fw-bold"></i>
+                                    }
+                                    else
+                                    {
+                                        <span class="fw-semibold small">@lesson.LessonOrder</span>
+                                    }
+                                </div>
+                                <div>
+                                    <div class="fw-semibold text-dark">
+                                        @lesson.Title
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (Model.IsEnrolled)
+                            {
+                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.LessonId" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    @(lesson.IsCompleted ? "Review" : "Start Lesson") <i class="bi bi-chevron-right ms-1"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-muted border px-2 py-1 small">
+                                    <i class="bi bi-lock-fill me-1"></i> Enroll to view
+                                </span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (Model.Course.Quizzes != null && Model.Course.Quizzes.Any())
+                {
+                    <h4 class="fw-bold text-dark mt-5 mb-3">
+                        <i class="bi bi-patch-question text-primary me-2"></i> Course Assessments
+                    </h4>
+                    <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                        @foreach (var q in Model.Course.Quizzes)
+                        {
+                            <div class="list-group-item p-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="fw-semibold text-dark">@q.Title</div>
+                                    <div class="text-muted small">@(q.Description ?? "Test your knowledge on this course.")</div>
+                                </div>
+                                @if (Model.IsEnrolled)
+                                {
+                                    <a asp-controller="Quizzes" asp-action="Take" asp-route-id="@q.QuizId" class="btn btn-sm btn-warning text-dark fw-semibold rounded-pill px-3">
+                                        Take Quiz <i class="bi bi-play-circle-fill ms-1"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border px-2 py-1 small">
+                                        <i class="bi bi-lock-fill me-1"></i> Enroll to take
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Sidebar (Right) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-top" style="top: 90px;">
+                <img src="@(string.IsNullOrEmpty(Model.Course.ImageUrl) ? "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80" : Model.Course.ImageUrl)" 
+                     class="card-img-top" alt="@Model.Course.Title" style="height: 200px; object-fit: cover;"
+                     onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80'">
+                
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fs-4 fw-bold text-success">Free Enrollment</span>
+                        <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill">Open Access</span>
+                    </div>
+
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <div class="alert alert-warning border-0 small d-flex align-items-center mb-3">
+                            <i class="bi bi-shield-lock-fill me-2 fs-5 text-warning"></i>
+                            <div><strong>Admin View:</strong> Manage course, lessons, and quizzes via the Admin console.</div>
+                        </div>
+                        <a asp-controller="AdminCourses" asp-action="Details" asp-route-id="@Model.Course.CourseId" class="btn btn-warning text-dark w-100 py-2 rounded-pill fw-semibold shadow-sm mb-3">
+                            <i class="bi bi-gear-fill me-1"></i> Manage in Admin Portal
+                        </a>
+                    }
+                    else if (Model.IsEnrolled)
+                    {
+                        <div class="alert alert-success d-flex align-items-center mb-3">
+                            <i class="bi bi-check-circle-fill me-2 fs-5 text-success"></i>
+                            <div><strong>Enrolled:</strong> You are actively enrolled in this course!</div>
+                        </div>
+
+                        <a asp-controller="Learner" asp-action="MyCourses" class="btn btn-outline-primary w-100 py-2 rounded-pill fw-semibold shadow-sm mb-2">
+                            <i class="bi bi-journal-bookmark me-1"></i> Go to My Courses
+                        </a>
+
+                        @if (Model.NextLessonId.HasValue)
+                        {
+                            <a asp-controller="Lessons" asp-action="Details" asp-route-id="@Model.NextLessonId" class="btn btn-primary w-100 py-2 rounded-pill fw-semibold shadow-sm mb-2">
+                                <i class="bi bi-play-circle-fill me-2"></i> Access Course Lessons
+                            </a>
+                        }
+                    }
+                    else if (User.Identity?.IsAuthenticated == true && User.IsInRole("Learner"))
+                    {
+                        <form asp-controller="Courses" asp-action="Enroll" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="courseId" value="@Model.Course.CourseId" />
+                            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mb-3">
+                                <i class="bi bi-lightning-charge-fill me-2"></i> Enroll in Course Now
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", "Courses", new { id = Model.Course.CourseId })" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mb-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Log in to Enroll
+                        </a>
+                    }
+
+                    <ul class="list-unstyled text-muted small d-flex flex-column gap-2 mb-0 pt-3 border-top">
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-book me-2 text-primary"></i> Total Lessons:</span>
+                            <span class="fw-bold text-dark">@Model.Lessons.Count</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-clock me-2 text-primary"></i> Duration:</span>
+                            <span class="fw-bold text-dark">@(Model.Course.Duration ?? "Self-paced")</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-globe me-2 text-primary"></i> Language:</span>
+                            <span class="fw-bold text-dark">English</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-person-workspace me-2 text-primary"></i> Access:</span>
+                            <span class="fw-bold text-dark">Lifetime Academic</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,174 @@
+@model CampusLearn.ViewModels.QuizFormViewModel
+@{
+    ViewData["Title"] = $"Edit Quiz: {Model.Title}";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-10">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">Edit Quiz</h3>
+                    <p class="text-muted small mb-0">Modify questions and answer options for @Model.CourseTitle</p>
+                </div>
+                <a asp-controller="AdminQuizzes" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Quizzes
+                </a>
+            </div>
+
+            <form asp-controller="AdminQuizzes" asp-action="Edit" asp-route-id="@Model.QuizId" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="QuizId" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="CourseId" class="form-label fw-semibold">Target Course</label>
+                        <select asp-for="CourseId" asp-items="ViewBag.CoursesList" class="form-select bg-light" required></select>
+                        <span asp-validation-for="CourseId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Title" class="form-label fw-semibold">Quiz Title</label>
+                        <input asp-for="Title" class="form-control bg-light" required />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label fw-semibold">Quiz Description</label>
+                    <input asp-for="Description" class="form-control bg-light" />
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <!-- Questions Builder -->
+                <div class="d-flex justify-content-between align-items-center mb-3 pt-3 border-top">
+                    <h5 class="fw-bold text-dark mb-0">Questions (@Model.Questions.Count)</h5>
+                    <button type="button" id="btnAddQuestion" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                        <i class="bi bi-plus-lg me-1"></i> Add Question
+                    </button>
+                </div>
+
+                <div id="questionsContainer" class="d-flex flex-column gap-4 mb-4">
+                    @for (int i = 0; i < Model.Questions.Count; i++)
+                    {
+                        <div class="question-item card bg-light border p-4 rounded-4" data-index="@i">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary px-3 py-2 rounded-pill question-badge">Question @(i + 1)</span>
+                                @if (i > 0)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill btn-remove-q">Remove</button>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Question Text</label>
+                                <input name="Questions[@i].QuestionText" value="@Model.Questions[i].QuestionText" class="form-control bg-white" required />
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Option A</label>
+                                    <input name="Questions[@i].OptionA" value="@Model.Questions[i].OptionA" class="form-control bg-white" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Option B</label>
+                                    <input name="Questions[@i].OptionB" value="@Model.Questions[i].OptionB" class="form-control bg-white" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Option C</label>
+                                    <input name="Questions[@i].OptionC" value="@Model.Questions[i].OptionC" class="form-control bg-white" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Option D</label>
+                                    <input name="Questions[@i].OptionD" value="@Model.Questions[i].OptionD" class="form-control bg-white" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small text-success">Correct Answer</label>
+                                <select name="Questions[@i].CorrectAnswer" class="form-select bg-white">
+                                    <option value="A" selected="@(Model.Questions[i].CorrectAnswer == "A")">Option A</option>
+                                    <option value="B" selected="@(Model.Questions[i].CorrectAnswer == "B")">Option B</option>
+                                    <option value="C" selected="@(Model.Questions[i].CorrectAnswer == "C")">Option C</option>
+                                    <option value="D" selected="@(Model.Questions[i].CorrectAnswer == "D")">Option D</option>
+                                </select>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a asp-controller="AdminQuizzes" asp-action="Index" class="btn btn-light border rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 fw-semibold shadow-sm">
+                        <i class="bi bi-check2 me-1"></i> Update Quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('btnAddQuestion').addEventListener('click', function() {
+            var container = document.getElementById('questionsContainer');
+            var index = container.querySelectorAll('.question-item').length;
+
+            var html = `
+                <div class="question-item card bg-light border p-4 rounded-4" data-index="${index}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary px-3 py-2 rounded-pill question-badge">Question ${index + 1}</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill btn-remove-q">Remove</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Question Text</label>
+                        <input name="Questions[${index}].QuestionText" class="form-control bg-white" placeholder="Enter question..." required />
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Option A</label>
+                            <input name="Questions[${index}].OptionA" class="form-control bg-white" placeholder="Option A text" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Option B</label>
+                            <input name="Questions[${index}].OptionB" class="form-control bg-white" placeholder="Option B text" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Option C</label>
+                            <input name="Questions[${index}].OptionC" class="form-control bg-white" placeholder="Option C text" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Option D</label>
+                            <input name="Questions[${index}].OptionD" class="form-control bg-white" placeholder="Option D text" required />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small text-success">Correct Answer</label>
+                        <select name="Questions[${index}].CorrectAnswer" class="form-select bg-white">
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+
+        document.getElementById('questionsContainer').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('btn-remove-q')) {
+                e.target.closest('.question-item').remove();
+                var items = document.querySelectorAll('.question-item');
+                items.forEach((item, idx) => {
+                    item.querySelector('.question-badge').textContent = `Question ${idx + 1}`;
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,62 @@
+@model CampusLearn.Models.Enrollment
+@{
+    ViewData["Title"] = $"Delete Enrollment - {Model.Course.Title}";
+    var progressCount = ViewBag.LessonProgressCount as int? ?? 0;
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white text-center">
+            <div class="rounded-circle bg-danger bg-opacity-10 text-danger mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2rem;">
+                <i class="bi bi-person-dash-fill"></i>
+            </div>
+
+            <h3 class="fw-bold text-dark mb-2">Remove Course Enrollment</h3>
+            <p class="text-muted mb-4">
+                Are you sure you want to remove the enrollment for <strong>@(Model.User?.FullName ?? Model.User?.Email)</strong> from the course <strong>@Model.Course.Title</strong>?
+            </p>
+
+            <!-- Impact Summary -->
+            <div class="card bg-light border p-3 rounded-3 mb-4 text-start small">
+                <div class="fw-bold text-dark mb-2"><i class="bi bi-info-circle me-1 text-primary"></i> Enrollment Impact Summary:</div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Learner:</span>
+                    <span class="fw-semibold text-dark">@(Model.User?.FullName ?? Model.User?.Email)</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Course:</span>
+                    <span class="fw-semibold text-dark">@Model.Course.Title</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Enrollment Date:</span>
+                    <span class="fw-semibold text-dark">@Model.EnrollmentDate.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Current Progress:</span>
+                    <span class="fw-semibold text-dark">@Model.ProgressPercentage% (@Model.Status)</span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span class="text-muted">Associated Lesson Progress Records:</span>
+                    <span class="fw-semibold text-danger">@progressCount record(s) will be cleared</span>
+                </div>
+            </div>
+
+            <div class="alert alert-warning border-0 small text-start mb-4">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                Removing this enrollment will remove the learner's course access and clear their completed lesson progress for this course. The learner's user account and the parent course itself will remain untouched.
+            </div>
+
+            <form asp-controller="AdminEnrollments" asp-action="Delete" asp-route-id="@Model.EnrollmentId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="d-flex justify-content-center gap-3">
+                    <a asp-controller="AdminEnrollments" asp-action="Index" class="btn btn-light border rounded-pill px-4">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger rounded-pill px-5 fw-bold shadow-sm">
+                        Confirm Removal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

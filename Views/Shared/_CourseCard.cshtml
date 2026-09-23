@@ -1,0 +1,63 @@
+@model CampusLearn.Models.Course
+
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100 course-card shadow-sm border-0 rounded-4 overflow-hidden position-relative">
+        <div class="course-img-wrapper position-relative">
+            <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80" : Model.ImageUrl)" 
+                 class="card-img-top course-img" alt="@Model.Title"
+                 onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80'">
+            @if (!string.IsNullOrEmpty(Model.Category))
+            {
+                <span class="badge bg-primary position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                    @Model.Category
+                </span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Duration))
+            {
+                <span class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                    @Model.Duration
+                </span>
+            }
+        </div>
+        <div class="card-body d-flex flex-column p-4">
+            <div class="d-flex align-items-center text-muted small mb-2">
+                <i class="bi bi-book-half me-1 text-primary"></i>
+                <span>@(Model.Lessons?.Count ?? 0) Lessons</span>
+                <span class="mx-2">•</span>
+                <i class="bi bi-people me-1 text-primary"></i>
+                <span>@(Model.Enrollments?.Count ?? 0) Enrolled</span>
+            </div>
+            <h5 class="card-title fw-bold text-dark mb-2">@Model.Title</h5>
+            <p class="card-text text-muted flex-grow-1 small line-clamp-3">
+                @Model.Description
+            </p>
+            <div class="pt-3 border-top mt-auto d-flex align-items-center justify-content-between">
+                <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+                    View Course <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <a asp-controller="AdminCourses" asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-warning btn-sm text-dark rounded-pill px-3 fw-semibold">
+                        Manage <i class="bi bi-gear-fill ms-1"></i>
+                    </a>
+                }
+                else if (User.Identity?.IsAuthenticated == true && User.IsInRole("Learner"))
+                {
+                    <form asp-controller="Courses" asp-action="Enroll" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="courseId" value="@Model.CourseId" />
+                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold shadow-sm">
+                            Enroll Free
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", "Courses", new { id = Model.CourseId })" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold shadow-sm">
+                        Enroll
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

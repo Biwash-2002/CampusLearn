@@ -1,0 +1,85 @@
+@model CampusLearn.ViewModels.CourseListViewModel
+@{
+    ViewData["Title"] = "Course Catalogue";
+}
+
+<div class="py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h1 class="fw-bold text-dark mb-1">Course Catalogue</h1>
+            <p class="text-muted mb-0">Browse through our structured curriculum and enroll in your favorite subjects</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <span class="badge bg-primary-subtle text-primary fs-6 px-3 py-2 rounded-pill">
+                @Model.TotalCoursesCount Available Courses
+            </span>
+        </div>
+    </div>
+
+    <!-- Filters & Search Form -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 bg-white">
+        <form asp-controller="Courses" asp-action="Index" method="get">
+            <div class="row g-3 align-items-center">
+                <div class="col-lg-7 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="search" value="@Model.SearchTerm" class="form-control bg-light border-start-0" placeholder="Search by course title or keyword..." />
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-4">
+                    <select name="category" class="form-select bg-light" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <option value="@cat" selected="@(cat == Model.SelectedCategory)">@cat</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-semibold">
+                        Search
+                    </button>
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm) || !string.IsNullOrEmpty(Model.SelectedCategory))
+                    {
+                        <a asp-controller="Courses" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3" title="Reset Filters">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Courses Grid -->
+    <div class="row">
+        @if (Model.Courses.Any())
+        {
+            foreach (var course in Model.Courses)
+            {
+                <partial name="_CourseCard" model="course" />
+            }
+        }
+        else if (!string.IsNullOrEmpty(Model.SearchTerm) || !string.IsNullOrEmpty(Model.SelectedCategory))
+        {
+            <div class="col-12 text-center py-5 bg-white rounded-4 border">
+                <i class="bi bi-search fs-1 text-muted mb-3 d-block"></i>
+                <h5 class="fw-bold text-dark">No courses match your criteria</h5>
+                <p class="text-muted">Try adjusting your keyword search or category filters.</p>
+                <a asp-controller="Courses" asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">
+                    Reset All Filters
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="col-12 text-center py-5 bg-white rounded-4 border">
+                <i class="bi bi-journal-x fs-1 text-muted mb-3 d-block"></i>
+                <h5 class="fw-bold text-dark">No courses available in the catalogue</h5>
+                <p class="text-muted">Academic courses will appear here once published by administrators.</p>
+            </div>
+        }
+    </div>
+</div>

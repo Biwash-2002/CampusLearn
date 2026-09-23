@@ -1,0 +1,125 @@
+@model List<CampusLearn.ViewModels.LearnerItemViewModel>
+@{
+    ViewData["Title"] = "Learner Management";
+    var search = ViewBag.Search as string;
+}
+
+<div class="py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a asp-controller="Admin" asp-action="Dashboard" class="badge bg-warning text-dark text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Admin Console
+                </a>
+            </div>
+            <h1 class="fw-bold text-dark mb-0">Learner Accounts Management</h1>
+            <p class="text-muted small mb-0">Review registered learner accounts, enrolled courses, and performance.</p>
+        </div>
+        <div>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fs-6">
+                <i class="bi bi-people-fill me-1"></i> Registered Learners: @Model.Count
+            </span>
+        </div>
+    </div>
+
+    <!-- Search / Filter Bar -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-4">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control bg-light border-start-0 rounded-end-pill" placeholder="Search by name, email, or username..." value="@search" />
+                </div>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                    Search
+                </button>
+                @if (!string.IsNullOrEmpty(search))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 ms-1">
+                        Clear
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Learners Table -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th style="width: 25%;">Learner Name</th>
+                        <th style="width: 25%;">Email Address</th>
+                        <th style="width: 15%;">Registered</th>
+                        <th style="width: 12%;">Enrolled</th>
+                        <th style="width: 11%;">Quizzes</th>
+                        <th style="width: 12%;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 38px; height: 38px; font-size: 1rem;">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div>
+                                            <a asp-controller="AdminLearners" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-dark text-decoration-none d-block">
+                                                @item.FullName
+                                            </a>
+                                            <span class="badge bg-light text-muted border small">Learner</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-muted">@item.Email</td>
+                                <td><span class="text-muted small">@item.CreatedAt.ToString("MMM dd, yyyy")</span></td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill">
+                                        @item.EnrolledCoursesCount Courses
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning bg-opacity-25 text-dark border border-warning-subtle px-2.5 py-1 rounded-pill">
+                                        @item.QuizzesTakenCount Quizzes
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-controller="AdminLearners" asp-action="Details" asp-route-id="@item.Id" class="btn btn-light border" title="View Learner Profile & Progress">
+                                            <i class="bi bi-eye text-primary me-1"></i> Details
+                                        </a>
+                                        <a asp-controller="AdminLearners" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-light border text-danger" title="Delete Learner Account">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-people display-4 text-muted d-block mb-3 opacity-50"></i>
+                                <h5>No learners found</h5>
+                                <p class="small text-muted mb-0">
+                                    @(string.IsNullOrEmpty(search) ? "No learners have registered on the platform yet." : $"No learner matches the search term '{search}'.")
+                                </p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

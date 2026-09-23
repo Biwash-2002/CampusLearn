@@ -1,0 +1,121 @@
+@model CampusLearn.ViewModels.QuestionFormViewModel
+@{
+    ViewData["Title"] = $"Add Question to Quiz: {Model.QuizTitle}";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-9 col-xl-8">
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <a asp-controller="AdminQuizzes" asp-action="Details" asp-route-id="@Model.QuizId" class="badge bg-secondary text-white text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i> Back to Quiz Details
+            </a>
+            @if (!string.IsNullOrEmpty(Model.CourseTitle))
+            {
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    @Model.CourseTitle
+                </span>
+            }
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+            <div class="mb-4">
+                <h2 class="fw-bold text-dark mb-1">Add Quiz Question</h2>
+                <p class="text-muted small mb-0">
+                    Adding a new multiple choice question to <strong>@Model.QuizTitle</strong>.
+                </p>
+            </div>
+
+            <form asp-controller="AdminQuizzes" asp-action="AddQuestion" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="QuizId" />
+                <input type="hidden" asp-for="QuizTitle" />
+                <input type="hidden" asp-for="CourseTitle" />
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4 py-2 small" role="alert"></div>
+
+                <!-- Question Text -->
+                <div class="mb-4">
+                    <label asp-for="QuestionText" class="form-label fw-bold text-dark">
+                        Question Text <span class="text-danger">*</span>
+                    </label>
+                    <textarea asp-for="QuestionText" class="form-control" rows="3" placeholder="Enter the question statement here..."></textarea>
+                    <span asp-validation-for="QuestionText" class="text-danger small"></span>
+                </div>
+
+                <!-- Options -->
+                <h5 class="fw-bold text-dark mb-3">Answer Options</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="OptionA" class="form-label fw-semibold text-dark">
+                            <span class="badge bg-secondary me-1">A</span> Option A <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="OptionA" class="form-control" placeholder="Enter Option A" />
+                        <span asp-validation-for="OptionA" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="OptionB" class="form-label fw-semibold text-dark">
+                            <span class="badge bg-secondary me-1">B</span> Option B <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="OptionB" class="form-control" placeholder="Enter Option B" />
+                        <span asp-validation-for="OptionB" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="OptionC" class="form-label fw-semibold text-dark">
+                            <span class="badge bg-secondary me-1">C</span> Option C <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="OptionC" class="form-control" placeholder="Enter Option C" />
+                        <span asp-validation-for="OptionC" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="OptionD" class="form-label fw-semibold text-dark">
+                            <span class="badge bg-secondary me-1">D</span> Option D <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="OptionD" class="form-control" placeholder="Enter Option D" />
+                        <span asp-validation-for="OptionD" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Correct Answer Selection -->
+                <div class="mb-4 p-3 bg-light rounded-3 border">
+                    <label asp-for="CorrectAnswer" class="form-label fw-bold text-dark d-block">
+                        <i class="bi bi-check-circle text-success me-1"></i> Correct Answer Key <span class="text-danger">*</span>
+                    </label>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="CorrectAnswer" id="ansA" value="A" />
+                            <label class="form-check-label fw-semibold" for="ansA">Option A</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="CorrectAnswer" id="ansB" value="B" />
+                            <label class="form-check-label fw-semibold" for="ansB">Option B</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="CorrectAnswer" id="ansC" value="C" />
+                            <label class="form-check-label fw-semibold" for="ansC">Option C</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="CorrectAnswer" id="ansD" value="D" />
+                            <label class="form-check-label fw-semibold" for="ansD">Option D</label>
+                        </div>
+                    </div>
+                    <span asp-validation-for="CorrectAnswer" class="text-danger small d-block mt-1"></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a asp-controller="AdminQuizzes" asp-action="Details" asp-route-id="@Model.QuizId" class="btn btn-light border rounded-pill px-4">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Save Question
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

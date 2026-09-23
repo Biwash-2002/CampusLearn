@@ -1,0 +1,104 @@
+@model CampusLearn.ViewModels.QuizResultDetailViewModel
+@{
+    ViewData["Title"] = $"Results: {Model.QuizTitle}";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <!-- Result Summary Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white mb-4">
+            <div class="rounded-circle @(Model.IsPassed ? "bg-success bg-opacity-10 text-success" : "bg-danger bg-opacity-10 text-danger") mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="bi @(Model.IsPassed ? "bi-check-circle-fill" : "bi-x-circle-fill")"></i>
+            </div>
+
+            <span class="badge @(Model.IsPassed ? "bg-success" : "bg-danger") px-3 py-2 rounded-pill fs-6 mb-3">
+                @(Model.IsPassed ? "Passed Assessment" : "Needs Improvement")
+            </span>
+
+            <h2 class="fw-bold text-dark mb-1">You scored @Model.Result.Score out of @Model.Result.TotalQuestions</h2>
+            <p class="fs-4 fw-bold @(Model.IsPassed ? "text-success" : "text-danger") mb-3">@Model.Percentage%</p>
+
+            <p class="text-muted max-w-500 mx-auto mb-4">
+                @if (Model.IsPassed)
+                {
+                    <span>Congratulations! You demonstrated a solid understanding of the materials in <strong>@Model.CourseTitle</strong>.</span>
+                }
+                else
+                {
+                    <span>You scored below the 60% passing benchmark. We recommend reviewing the course lessons and retaking the quiz.</span>
+                }
+            </p>
+
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a asp-controller="Learner" asp-action="MyCourses" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="bi bi-journal-bookmark me-1"></i> My Courses
+                </a>
+                <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="bi bi-collection-play me-1"></i> Course Overview
+                </a>
+                <a asp-controller="Quizzes" asp-action="Take" asp-route-id="@Model.QuizId" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-arrow-repeat me-1"></i> Retake Quiz
+                </a>
+            </div>
+        </div>
+
+        <!-- Answer Key & Detailed Review -->
+        @if (Model.QuestionFeedbacks.Any())
+        {
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark mb-1">
+                        <i class="bi bi-list-check text-primary me-2"></i> Question Breakdown & Answer Key
+                    </h4>
+                    <p class="text-muted small mb-0">Review the correct answers for each question below.</p>
+                </div>
+
+                <div class="d-flex flex-column gap-4">
+                    @for (int i = 0; i < Model.QuestionFeedbacks.Count; i++)
+                    {
+                        var q = Model.QuestionFeedbacks[i];
+                        var qNum = i + 1;
+
+                        <div class="p-4 rounded-3 border bg-light">
+                            <div class="d-flex align-items-start gap-2 mb-3">
+                                <span class="badge bg-secondary rounded-circle px-2 py-1 small">@qNum</span>
+                                <h6 class="fw-bold text-dark mb-0 pt-1">@q.QuestionText</h6>
+                            </div>
+
+                            <div class="row g-2 ms-md-3 mb-2">
+                                <div class="col-md-6">
+                                    <div class="p-2.5 rounded-2 border @(q.CorrectAnswer == "A" ? "bg-success bg-opacity-10 border-success text-success fw-bold" : "bg-white")">
+                                        <span class="badge @(q.CorrectAnswer == "A" ? "bg-success" : "bg-light text-dark border") me-2">A</span> @q.OptionA
+                                        @if (q.CorrectAnswer == "A") { <i class="bi bi-check-circle-fill ms-1 text-success"></i> }
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-2.5 rounded-2 border @(q.CorrectAnswer == "B" ? "bg-success bg-opacity-10 border-success text-success fw-bold" : "bg-white")">
+                                        <span class="badge @(q.CorrectAnswer == "B" ? "bg-success" : "bg-light text-dark border") me-2">B</span> @q.OptionB
+                                        @if (q.CorrectAnswer == "B") { <i class="bi bi-check-circle-fill ms-1 text-success"></i> }
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-2.5 rounded-2 border @(q.CorrectAnswer == "C" ? "bg-success bg-opacity-10 border-success text-success fw-bold" : "bg-white")">
+                                        <span class="badge @(q.CorrectAnswer == "C" ? "bg-success" : "bg-light text-dark border") me-2">C</span> @q.OptionC
+                                        @if (q.CorrectAnswer == "C") { <i class="bi bi-check-circle-fill ms-1 text-success"></i> }
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-2.5 rounded-2 border @(q.CorrectAnswer == "D" ? "bg-success bg-opacity-10 border-success text-success fw-bold" : "bg-white")">
+                                        <span class="badge @(q.CorrectAnswer == "D" ? "bg-success" : "bg-light text-dark border") me-2">D</span> @q.OptionD
+                                        @if (q.CorrectAnswer == "D") { <i class="bi bi-check-circle-fill ms-1 text-success"></i> }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 text-muted small ms-md-3">
+                                Correct Answer: <strong class="text-success">Option @q.CorrectAnswer</strong>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

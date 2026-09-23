@@ -1,0 +1,35 @@
+@model CampusLearn.Models.Course
+@{
+    ViewData["Title"] = $"Delete Course: {Model.Title}";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white text-center">
+            <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-2">Delete Course Confirmation</h3>
+            <p class="text-muted mb-4">
+                Are you sure you want to permanently delete <strong>@Model.Title</strong>? All associated lessons, quizzes, and learner enrollment records will be permanently removed.
+            </p>
+
+            <div class="card bg-light border p-3 rounded-3 mb-4 text-start small text-muted">
+                <div><strong>Category:</strong> @(Model.Category ?? "General")</div>
+                <div><strong>Duration:</strong> @(Model.Duration ?? "Self-paced")</div>
+                <div><strong>Lessons count:</strong> @(Model.Lessons?.Count ?? 0)</div>
+                <div><strong>Enrolled learners:</strong> @(Model.Enrollments?.Count ?? 0)</div>
+            </div>
+
+            <form asp-controller="AdminCourses" asp-action="Delete" asp-route-id="@Model.CourseId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="d-flex justify-content-center gap-3">
+                    <a asp-controller="AdminCourses" asp-action="Index" class="btn btn-light border rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-danger rounded-pill px-5 fw-bold shadow-sm">
+                        Confirm Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

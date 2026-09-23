@@ -1,0 +1,189 @@
+@model List<CampusLearn.Models.QuizResult>
+@{
+    ViewData["Title"] = "Quiz Results Management";
+    var courses = ViewBag.Courses as List<CampusLearn.Models.Course> ?? new List<CampusLearn.Models.Course>();
+    var quizzes = ViewBag.Quizzes as List<CampusLearn.Models.Quiz> ?? new List<CampusLearn.Models.Quiz>();
+    var learners = ViewBag.Learners as List<CampusLearn.Models.ApplicationUser> ?? new List<CampusLearn.Models.ApplicationUser>();
+    string? selectedUserId = ViewBag.SelectedUserId as string;
+    int? selectedCourseId = ViewBag.SelectedCourseId as int?;
+    int? selectedQuizId = ViewBag.SelectedQuizId as int?;
+    var selectedLearner = ViewBag.SelectedLearner as CampusLearn.Models.ApplicationUser;
+    var selectedCourse = ViewBag.SelectedCourse as CampusLearn.Models.Course;
+    var selectedQuiz = ViewBag.SelectedQuiz as CampusLearn.Models.Quiz;
+}
+
+<div class="py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a asp-controller="Admin" asp-action="Dashboard" class="badge bg-warning text-dark text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Admin Console
+                </a>
+            </div>
+            <h1 class="fw-bold text-dark mb-0">Quiz Assessment Submissions</h1>
+            <p class="text-muted small mb-0">Audit and inspect learner quiz attempt submissions, scores, and answer accuracy.</p>
+        </div>
+        <div>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fs-6">
+                <i class="bi bi-patch-question-fill me-1"></i> Total Submissions: @Model.Count
+            </span>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 mb-4">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-md-auto">
+                <span class="fw-bold small text-muted"><i class="bi bi-funnel me-1"></i> Filters:</span>
+            </div>
+            <!-- Learner Filter -->
+            <div class="col-md-3">
+                <select name="userId" class="form-select rounded-pill" onchange="this.form.submit()">
+                    <option value="">-- All Learners (@learners.Count) --</option>
+                    @foreach (var l in learners)
+                    {
+                        if (!string.IsNullOrEmpty(selectedUserId) && selectedUserId == l.Id)
+                        {
+                            <option value="@l.Id" selected="selected">@(l.FullName ?? l.UserName) (@l.Email)</option>
+                        }
+                        else
+                        {
+                            <option value="@l.Id">@(l.FullName ?? l.UserName) (@l.Email)</option>
+                        }
+                    }
+                </select>
+            </div>
+            <!-- Course Filter -->
+            <div class="col-md-3">
+                <select name="courseId" class="form-select rounded-pill" onchange="this.form.submit()">
+                    <option value="">-- All Courses (@courses.Count) --</option>
+                    @foreach (var c in courses)
+                    {
+                        if (selectedCourseId.HasValue && selectedCourseId.Value == c.CourseId)
+                        {
+                            <option value="@c.CourseId" selected="selected">@c.Title</option>
+                        }
+                        else
+                        {
+                            <option value="@c.CourseId">@c.Title</option>
+                        }
+                    }
+                </select>
+            </div>
+            <!-- Quiz Filter -->
+            <div class="col-md-3">
+                <select name="quizId" class="form-select rounded-pill" onchange="this.form.submit()">
+                    <option value="">-- All Quizzes (@quizzes.Count) --</option>
+                    @foreach (var q in quizzes)
+                    {
+                        if (selectedQuizId.HasValue && selectedQuizId.Value == q.QuizId)
+                        {
+                            <option value="@q.QuizId" selected="selected">@q.Title</option>
+                        }
+                        else
+                        {
+                            <option value="@q.QuizId">@q.Title</option>
+                        }
+                    }
+                </select>
+            </div>
+            @if (!string.IsNullOrEmpty(selectedUserId) || selectedCourseId.HasValue || selectedQuizId.HasValue)
+            {
+                <div class="col-md-auto">
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill">
+                        <i class="bi bi-x-circle me-1"></i> Clear Filters
+                    </a>
+                </div>
+            }
+        </form>
+    </div>
+
+    <!-- Quiz Results Table -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th style="width: 22%;">Learner</th>
+                        <th style="width: 22%;">Course Title</th>
+                        <th style="width: 20%;">Quiz Title</th>
+                        <th style="width: 10%;">Score</th>
+                        <th style="width: 12%;">Outcome</th>
+                        <th style="width: 14%;">Attempt Date</th>
+                        <th style="width: 10%;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var percent = item.TotalQuestions > 0 ? (int)Math.Round((double)item.Score / item.TotalQuestions * 100) : 0;
+                            var isPass = percent >= 60;
+
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.9rem;">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div>
+                                            <a asp-controller="AdminLearners" asp-action="Details" asp-route-id="@item.UserId" class="fw-bold text-dark text-decoration-none d-block">
+                                                @(item.User?.FullName ?? item.User?.UserName ?? "User")
+                                            </a>
+                                            <span class="text-muted small">@item.User?.Email</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a asp-controller="AdminCourses" asp-action="Details" asp-route-id="@item.Quiz.CourseId" class="fw-semibold text-primary text-decoration-none">
+                                        @item.Quiz.Course.Title
+                                    </a>
+                                </td>
+                                <td>
+                                    <a asp-controller="AdminQuizzes" asp-action="Details" asp-route-id="@item.QuizId" class="fw-medium text-dark text-decoration-none">
+                                        @item.Quiz.Title
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark">@item.Score</span> / <span class="text-muted">@item.TotalQuestions</span>
+                                </td>
+                                <td>
+                                    <span class="badge @(isPass ? "bg-success-subtle text-success border border-success-subtle" : "bg-danger-subtle text-danger border border-danger-subtle") px-2.5 py-1 rounded-pill">
+                                        @percent% @(isPass ? "Passed" : "Failed")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@item.AttemptDate.ToString("MMM dd, yyyy HH:mm")</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-controller="AdminQuizResults" asp-action="Details" asp-route-id="@item.QuizResultId" class="btn btn-light border" title="View Submission Report">
+                                            <i class="bi bi-eye text-primary me-1"></i> Report
+                                        </a>
+                                        <a asp-controller="AdminQuizResults" asp-action="Delete" asp-route-id="@item.QuizResultId" class="btn btn-light border text-danger" title="Delete Submission">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-award display-4 text-muted d-block mb-3 opacity-50"></i>
+                                <h5>No quiz submissions found</h5>
+                                <p class="small text-muted mb-0">
+                                    @(selectedCourse != null ? $"No submissions for course '{selectedCourse.Title}'." : (selectedLearner != null ? $"No submissions for '{selectedLearner.FullName ?? selectedLearner.Email}'." : (selectedQuiz != null ? $"No submissions for quiz '{selectedQuiz.Title}'." : "No learner quiz attempts recorded yet.")))
+                                </p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

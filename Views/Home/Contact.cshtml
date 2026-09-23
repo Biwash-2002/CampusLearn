@@ -1,0 +1,104 @@
+@model CampusLearn.Models.ContactMessage
+@{
+    ViewData["Title"] = "Contact Campus Support";
+}
+
+<div class="py-4">
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-2">Get in Touch</span>
+            <h2 class="fw-bold mb-3">We'd love to hear from you</h2>
+            <p class="text-muted mb-4">
+                Have questions regarding course offerings, semester enrollments, or technical issues? Send us a message and our academic coordinators will assist you promptly.
+            </p>
+
+            <div class="d-flex flex-column gap-3 mb-4">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white d-flex flex-row align-items-center">
+                    <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary me-3 flex-shrink-0">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Campus Department</div>
+                        <div class="text-muted small">Department of Computer Science & Engineering</div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white d-flex flex-row align-items-center">
+                    <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success me-3 flex-shrink-0">
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Email Inquiries</div>
+                        <div class="text-muted small">support@campuslearn.edu</div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white d-flex flex-row align-items-center">
+                    <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning me-3 flex-shrink-0">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Support Hours</div>
+                        <div class="text-muted small">Mon - Fri: 8:00 AM - 5:00 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <h4 class="fw-bold text-dark mb-4">Send a Message</h4>
+                
+                <form asp-controller="Home" asp-action="Contact" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label fw-semibold">Your Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
+                                <input asp-for="Name" class="form-control bg-light border-start-0" placeholder="e.g. Alex Johnson" required />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label fw-semibold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" type="email" class="form-control bg-light border-start-0" placeholder="alex@campus.edu" required />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Subject" class="form-label fw-semibold">Subject</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-chat-left-text"></i></span>
+                                <input asp-for="Subject" class="form-control bg-light border-start-0" placeholder="e.g. Question about Course Enrollment" required />
+                            </div>
+                            <span asp-validation-for="Subject" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Message" class="form-label fw-semibold">Your Message</label>
+                            <textarea asp-for="Message" class="form-control bg-light" rows="5" placeholder="Write your question or feedback here..." required></textarea>
+                            <span asp-validation-for="Message" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-semibold shadow">
+                                <i class="bi bi-send me-2"></i> Submit Inquiry
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

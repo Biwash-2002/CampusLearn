@@ -1,0 +1,180 @@
+@model CampusLearn.ViewModels.EnrollmentDetailViewModel
+@{
+    ViewData["Title"] = $"Enrollment: {Model.Enrollment.User?.FullName ?? Model.Enrollment.User?.Email} - {Model.Enrollment.Course.Title}";
+}
+
+<div class="py-4">
+    <!-- Breadcrumb & Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a asp-controller="AdminEnrollments" asp-action="Index" class="badge bg-secondary text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Enrollments
+                </a>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    @Model.Enrollment.Course.Category
+                </span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Enrollment Details</h2>
+            <div class="text-muted small">
+                Student: <strong>@(Model.Enrollment.User?.FullName ?? Model.Enrollment.User?.Email)</strong> • Enrolled: @Model.Enrollment.EnrollmentDate.ToString("MMMM dd, yyyy")
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-controller="AdminEnrollments" asp-action="Delete" asp-route-id="@Model.Enrollment.EnrollmentId" class="btn btn-outline-danger rounded-pill px-4 btn-sm">
+                <i class="bi bi-trash me-1"></i> Remove Enrollment
+            </a>
+            <a asp-controller="AdminCourses" asp-action="Details" asp-route-id="@Model.Enrollment.CourseId" class="btn btn-light border rounded-pill px-4 btn-sm">
+                View Course
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Metric Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-pie-chart-fill fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Progress</span>
+                    <h4 class="fw-bold mb-0 text-dark">@Model.Enrollment.ProgressPercentage%</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-success bg-opacity-10 text-success p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-journal-check fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Completed Lessons</span>
+                    <h4 class="fw-bold mb-0 text-dark">@Model.CompletedLessonsCount / @Model.TotalLessonsCount</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-info bg-opacity-10 text-info p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-award-fill fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Enrollment Status</span>
+                    <h5 class="fw-bold mb-0 @(Model.Enrollment.Status == "Completed" ? "text-success" : "text-primary")">
+                        @(Model.Enrollment.Status == "Completed" ? "Completed" : "Active")
+                    </h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-warning bg-opacity-10 text-warning p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-patch-question-fill fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Quiz Assessment</span>
+                    <h5 class="fw-bold mb-0 text-dark">
+                        @(Model.QuizResult != null ? $"{Model.QuizResult.Score}/{Model.QuizResult.TotalQuestions} ({Math.Round((double)Model.QuizResult.Score / Model.QuizResult.TotalQuestions * 100)}%)" : "Not attempted")
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student & Course Details Grid -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-person text-primary me-2"></i> Learner Profile
+                </h5>
+                <div class="d-flex flex-column gap-2 small">
+                    <div><strong>Name:</strong> @(Model.Enrollment.User?.FullName ?? Model.Enrollment.User?.UserName)</div>
+                    <div><strong>Email:</strong> @Model.Enrollment.User?.Email</div>
+                    <div><strong>User ID:</strong> <code class="text-muted">@Model.Enrollment.UserId</code></div>
+                    <div><strong>Member Since:</strong> @Model.Enrollment.User?.CreatedAt.ToString("MMM dd, yyyy")</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-collection-play text-primary me-2"></i> Enrolled Course
+                </h5>
+                <div class="d-flex flex-column gap-2 small">
+                    <div><strong>Course Title:</strong> @Model.Enrollment.Course.Title</div>
+                    <div><strong>Category:</strong> @Model.Enrollment.Course.Category</div>
+                    <div><strong>Duration:</strong> @Model.Enrollment.Course.Duration</div>
+                    <div><strong>Total Curriculum Lessons:</strong> @Model.TotalLessonsCount lesson(s)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Lessons Progress List -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
+        <div class="card-header bg-white p-4 border-bottom">
+            <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-journal-text text-primary me-2"></i> Lesson Progress Checklist (@Model.CompletedLessonsCount/@Model.TotalLessonsCount Completed)
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Enrollment.Course.Lessons.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-muted">
+                            <tr>
+                                <th style="width: 10%;">Order</th>
+                                <th style="width: 50%;">Lesson Title</th>
+                                <th style="width: 20%;">Status</th>
+                                <th style="width: 20%;">Completed At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var lesson in Model.Enrollment.Course.Lessons)
+                            {
+                                var prog = Model.LessonProgresses.FirstOrDefault(lp => lp.LessonId == lesson.LessonId);
+                                var isCompleted = prog?.Completed == true;
+
+                                <tr>
+                                    <td>
+                                        <span class="badge @(isCompleted ? "bg-success" : "bg-light text-muted border") rounded-pill">
+                                            Lesson @lesson.LessonOrder
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold text-dark">@lesson.Title</td>
+                                    <td>
+                                        @if (isCompleted)
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Completed
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted border px-2.5 py-1 rounded-pill">
+                                                Not Completed
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-muted small">
+                                        @(prog?.CompletedAt?.ToString("MMM dd, yyyy HH:mm") ?? "-")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted small">
+                    This course does not have any lessons created yet.
+                </div>
+            }
+        </div>
+    </div>
+</div>

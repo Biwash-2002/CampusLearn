@@ -1,0 +1,57 @@
+@model CampusLearn.ViewModels.LearnerDeleteViewModel
+@{
+    ViewData["Title"] = $"Delete Learner: {Model.FullName}";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white text-center">
+            <div class="rounded-circle bg-danger bg-opacity-10 text-danger mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2rem;">
+                <i class="bi bi-person-x-fill"></i>
+            </div>
+
+            <h3 class="fw-bold text-dark mb-2">Delete Learner Confirmation</h3>
+            <p class="text-muted mb-4">
+                Are you sure you want to permanently delete the learner account for <strong>@Model.FullName</strong> (<em>@Model.Email</em>)?
+            </p>
+
+            <!-- Impact Summary -->
+            <div class="card bg-light border p-3 rounded-3 mb-4 text-start small">
+                <div class="fw-bold text-dark mb-2"><i class="bi bi-info-circle me-1 text-primary"></i> Account Summary & Data Impact:</div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Account Registered:</span>
+                    <span class="fw-semibold text-dark">@Model.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Course Enrollments:</span>
+                    <span class="fw-semibold text-dark">@Model.EnrolledCoursesCount course(s)</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Completed Lessons:</span>
+                    <span class="fw-semibold text-dark">@Model.CompletedLessonsCount lesson(s)</span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span class="text-muted">Quiz Submissions:</span>
+                    <span class="fw-semibold text-dark">@Model.QuizResultsCount attempt(s)</span>
+                </div>
+            </div>
+
+            <div class="alert alert-warning border-0 small text-start mb-4">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                Deleting this learner account will permanently remove their enrollment records, lesson progress, and quiz results. Parent courses, lessons, and quizzes will remain untouched.
+            </div>
+
+            <form asp-controller="AdminLearners" asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="d-flex justify-content-center gap-3">
+                    <a asp-controller="AdminLearners" asp-action="Index" class="btn btn-light border rounded-pill px-4">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger rounded-pill px-5 fw-bold shadow-sm">
+                        Confirm Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
