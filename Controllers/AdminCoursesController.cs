@@ -85,11 +85,11 @@ public class AdminCoursesController : Controller
         {
             var course = new Course
             {
-                Title = model.Title,
-                Description = model.Description,
-                Category = model.Category,
-                Duration = model.Duration,
-                ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? "/images/default-course.jpg" : model.ImageUrl,
+                Title = model.Title.Trim(),
+                Description = model.Description.Trim(),
+                Category = model.Category.Trim(),
+                Duration = model.Duration.Trim(),
+                ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? "/images/default-course.jpg" : model.ImageUrl.Trim(),
                 IsActive = model.IsActive,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -145,11 +145,11 @@ public class AdminCoursesController : Controller
                 return NotFound();
             }
 
-            course.Title = model.Title;
-            course.Description = model.Description;
-            course.Category = model.Category;
-            course.Duration = model.Duration;
-            course.ImageUrl = model.ImageUrl;
+            course.Title = model.Title.Trim();
+            course.Description = model.Description.Trim();
+            course.Category = model.Category.Trim();
+            course.Duration = model.Duration.Trim();
+            course.ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl.Trim();
             course.IsActive = model.IsActive;
             course.UpdatedAt = DateTime.UtcNow;
 

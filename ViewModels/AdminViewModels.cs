@@ -40,6 +40,7 @@ public class CourseFormViewModel
     public string Duration { get; set; } = string.Empty;
 
     [StringLength(500, ErrorMessage = "Image URL cannot exceed 500 characters")]
+    [RegularExpression(@"^(https?:\/\/|\/|~\/)[^\s]+$", ErrorMessage = "Please enter a valid URL (starting with http://, https://, or /)")]
     [Display(Name = "Image URL (Optional)")]
     public string? ImageUrl { get; set; }
 

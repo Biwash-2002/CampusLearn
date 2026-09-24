@@ -20,7 +20,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+    let currentTheme = 'light';
+    try {
+        currentTheme = document.documentElement.getAttribute('data-bs-theme') || localStorage.getItem('campuslearn-theme') || 'light';
+    } catch (e) {
+        currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+    }
     updateThemeUI(currentTheme);
 
     if (themeToggleBtn) {
@@ -28,7 +33,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const activeTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
             const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('campuslearn-theme', newTheme);
+            try {
+                localStorage.setItem('campuslearn-theme', newTheme);
+            } catch (e) {
+                // Ignore storage errors on restricted mobile browsers
+            }
             updateThemeUI(newTheme);
         });
     }

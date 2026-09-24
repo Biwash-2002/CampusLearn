@@ -21,8 +21,12 @@
     <!-- Theme Script (Prevents Flickering) -->
     <script>
         (function () {
-            const savedTheme = localStorage.getItem('campuslearn-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            try {
+                const savedTheme = localStorage.getItem('campuslearn-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+            }
         })();
     </script>
 </head>
