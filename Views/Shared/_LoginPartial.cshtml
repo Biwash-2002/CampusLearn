@@ -4,6 +4,11 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav align-items-center gap-2">
+    <li class="nav-item">
+        <button id="themeToggle" type="button" class="btn theme-toggle-btn rounded-circle d-flex align-items-center justify-content-center" aria-label="Toggle Light and Dark Theme" title="Toggle Light and Dark Theme">
+            <i id="themeIcon" class="bi bi-moon-stars-fill"></i>
+        </button>
+    </li>
 @if (SignInManager.IsSignedIn(User))
 {
     @if (User.IsInRole("Administrator"))

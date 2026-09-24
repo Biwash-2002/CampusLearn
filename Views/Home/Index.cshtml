@@ -34,9 +34,9 @@
                 }
             </div>
         </div>
-        <div class="col-lg-5 d-none d-lg-block text-center position-relative">
-            <div class="p-4 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25 backdrop-blur shadow-2xl">
-                <div class="d-flex align-items-center justify-content-between text-white border-bottom border-white border-opacity-10 pb-3 mb-3">
+        <div class="col-lg-5 mt-4 mt-lg-0 text-center position-relative">
+            <div class="p-4 rounded-4 backdrop-blur learning-metrics-card">
+                <div class="d-flex align-items-center justify-content-between pb-3 mb-3 learning-metrics-header">
                     <div class="d-flex align-items-center">
                         <div class="brand-icon me-2 rounded-2 d-flex align-items-center justify-content-center text-white">
                             <i class="bi bi-mortarboard-fill"></i>
@@ -47,22 +47,22 @@
                 </div>
                 <div class="row g-3 text-start">
                     <div class="col-6">
-                        <div class="p-3 bg-dark bg-opacity-50 rounded-3">
-                            <div class="text-muted small">Total Courses</div>
-                            <div class="fs-4 fw-bold text-white">@ViewBag.TotalCourses</div>
+                        <div class="p-3 metric-box">
+                            <div class="metric-label small mb-1">Total Courses</div>
+                            <div class="metric-value fs-4 fw-bold">@ViewBag.TotalCourses</div>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="p-3 bg-dark bg-opacity-50 rounded-3">
-                            <div class="text-muted small">Enrolled Students</div>
-                            <div class="fs-4 fw-bold text-white">@ViewBag.TotalLearners</div>
+                        <div class="p-3 metric-box">
+                            <div class="metric-label small mb-1">Enrolled Students</div>
+                            <div class="metric-value fs-4 fw-bold">@ViewBag.TotalLearners</div>
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="p-3 bg-dark bg-opacity-50 rounded-3">
+                        <div class="p-3 metric-box">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="text-muted small">Course Completion Average</span>
-                                <span class="text-white small fw-bold">84%</span>
+                                <span class="metric-label small">Course Completion Average</span>
+                                <span class="metric-value small fw-bold">84%</span>
                             </div>
                             <div class="progress" style="height: 6px;">
                                 <div class="progress-bar bg-success" style="width: 84%"></div>

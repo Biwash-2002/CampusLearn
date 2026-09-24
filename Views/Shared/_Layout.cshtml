@@ -17,6 +17,14 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CampusLearn.styles.css" asp-append-version="true" />
+    
+    <!-- Theme Script (Prevents Flickering) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('campuslearn-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header class="sticky-top bg-white border-bottom shadow-sm nav-header">
